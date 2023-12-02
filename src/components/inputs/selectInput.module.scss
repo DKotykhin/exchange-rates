@@ -1,0 +1,9 @@
+@import "constants/constants.scss";
+
+.select_input {
+    min-width: 120px;
+
+    @media screen and (max-width: $mobile_bp) {
+        width: 100%;
+    }
+}

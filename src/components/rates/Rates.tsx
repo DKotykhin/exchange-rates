@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Paper, Typography, Box, Input } from '@mui/material';
 
 import { SelectInput } from 'components/inputs/SelectInput';
@@ -21,44 +21,44 @@ export const Rates: React.FC<{ currencyRates?: ApiResponse }> = ({ currencyRates
                 break;
         }
         return ratio;
-    }
+    };
 
     const [valueOne, setValueOne] = useState<number | null>();
     const [valueTwo, setValueTwo] = useState<number | null>();
     const [currencyOne, setCurrencyOne] = useState(CurrencyTypes.uah);
     const [currencyTwo, setCurrencyTwo] = useState(CurrencyTypes.usd);
 
-    useEffect(() => {
-        const ratioOne = getRatio(currencyOne);
-        const ratioTwo = getRatio(currencyTwo);
-        setValueTwo(valueOne ? valueOne / ratioOne * ratioTwo : null);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currencyOne]);
-
-    useEffect(() => {
-        const ratioOne = getRatio(currencyOne);
-        const ratioTwo = getRatio(currencyTwo);
-        setValueOne(valueTwo ? valueTwo * ratioOne / ratioTwo : null);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currencyTwo]);
-
-    const textFieldOne = (e: { currentTarget: { value: any; }; }) => {
+    const handleTextFieldOne = (e: { currentTarget: { value: any; }; }) => {
         const value = e.currentTarget.value;
         const ratioOne = getRatio(currencyOne);
         const ratioTwo = getRatio(currencyTwo);
 
         setValueOne(value);
-        setValueTwo(value / ratioOne * ratioTwo);
-    }
+        setValueTwo(Math.round(value / ratioOne * ratioTwo * 100) / 100);
+    };
 
-    const textFieldTwo = (e: { currentTarget: { value: any; }; }) => {
+    const handleTextFieldTwo = (e: { currentTarget: { value: any; }; }) => {
         const value = e.currentTarget.value;
         const ratioOne = getRatio(currencyOne);
         const ratioTwo = getRatio(currencyTwo);
 
         setValueTwo(value);
-        setValueOne(value * ratioOne / ratioTwo);
-    }
+        setValueOne(Math.round(value * ratioOne / ratioTwo * 100) / 100);
+    };
+
+    const handleSelectOne = (currency: CurrencyTypes) => {
+        setCurrencyOne(currency);
+        const ratioOne = getRatio(currency);
+        const ratioTwo = getRatio(currencyTwo);
+        setValueTwo(valueOne ? Math.round(valueOne / ratioOne * ratioTwo * 100) / 100 : null);
+    };
+
+    const handleSelectTwo = (currency: CurrencyTypes) => {
+        setCurrencyTwo(currency);
+        const ratioOne = getRatio(currencyOne);
+        const ratioTwo = getRatio(currency);
+        setValueOne(valueTwo ? Math.round(valueTwo * ratioOne / ratioTwo * 100) / 100 : null);
+    };
 
     return (
         <article className={styles.rates}>
@@ -69,12 +69,12 @@ export const Rates: React.FC<{ currencyRates?: ApiResponse }> = ({ currencyRates
                         type='number'
                         placeholder="Put amount..."
                         sx={{ width: '100%', mt: 2 }}
-                        onChange={textFieldOne}
+                        onChange={handleTextFieldOne}
                         value={valueOne}
                     />
                     <SelectInput 
                         currency={currencyOne} 
-                        setCurrency={(c: CurrencyTypes) => setCurrencyOne(c)} 
+                        setCurrency={handleSelectOne} 
                     />
                 </Box>
                 <Typography>To</Typography>
@@ -83,13 +83,13 @@ export const Rates: React.FC<{ currencyRates?: ApiResponse }> = ({ currencyRates
                         type='number'
                         placeholder="Put amount..."
                         sx={{ width: '100%', mt: 2 }}
-                        onChange={textFieldTwo}
+                        onChange={handleTextFieldTwo}
                         value={valueTwo}
 
                     />
                     <SelectInput 
                         currency={currencyTwo} 
-                        setCurrency={(c: CurrencyTypes) => setCurrencyTwo(c)} 
+                        setCurrency={handleSelectTwo} 
                     />
                 </Box>
             </Paper>
